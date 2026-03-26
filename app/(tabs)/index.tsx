@@ -3,9 +3,6 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Animat
 import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../context';
-import { BlurView } from 'expo-blur';
-import { Image } from 'expo-image';
-import LottieView from 'lottie-react-native';
 
 const GlitchTitle = ({ text, color }) => {
   const anim = useRef(new Animated.Value(1)).current;
@@ -29,15 +26,7 @@ const GlitchTitle = ({ text, color }) => {
 };
 
 export default function MainEngine() {
-    const lottieRef = useRef(null);
-
-useEffect(() => {
-  if (theme.bgLottie) {
-    lottieRef.current?.play();
-  }
-}, [theme]); // Когда тема меняется, пинаем анимаци
   const router = useRouter();
-  // Заменил addProject на saveProject, так как в контексте функция называется так
   const { theme, t, saveProject } = useTheme();
   const [activeTab, setActiveTab] = useState('MUSIC');
   const [f1, setF1] = useState('');
@@ -47,50 +36,13 @@ useEffect(() => {
   const handlePublish = () => {
     if (!f1) return;
     Vibration.vibrate(70);
-    saveProject({
-      id: Date.now().toString(),
-      type: activeTab,
-      field1: f1,
-      field2: f2,
-      field3: f3,
-      date: new Date().toLocaleDateString()
-    });
+    saveProject({ id: Date.now().toString(), type: activeTab, field1: f1, field2: f2, field3: f3, date: new Date().toLocaleDateString() });
     setF1(''); setF2(''); setF3('');
   };
 
-  // Хелпер для правильной подгрузки картинок
-  const getImgSource = (src) => {
-    if (!src) return null;
-    return typeof src === 'string' ? { uri: src } : src;
-  };
-
+  // Возвращаем просто View с flex: 1 (Фона и BlurView тут больше нет!)
   return (
-    <View style={{ flex: 1, backgroundColor: theme.bg }}>
-
-      {/* 1. LOTTIE (НИЖНИЙ СЛОЙ) */}
-      {theme.bgLottie && (
-        <LottieView
-        ref={lottieRef}
-          source={theme.bgLottie}
-          autoPlay
-          loop
-          speed={0.6}
-          style={StyleSheet.absoluteFillObject}
-          resizeMode="cover"
-        />
-      )}
-
-      {/* 2. IMAGE (ТОЛЬКО ЕСЛИ НЕТ LOTTIE) */}
-      {theme.bgImg && !theme.bgLottie && (
-        <Image
-          source={getImgSource(theme.bgImg)}
-          style={StyleSheet.absoluteFillObject}
-          contentFit="cover"
-        />
-      )}
-
-      {/* 3. КОНТЕНТ С БЛЮРОМ */}
-      <BlurView intensity={theme.bgLottie ? 30 : 60} tint="dark" style={{ flex: 1 }}>
+    <View style={{ flex: 1 }}>
         <View style={styles.topNav}>
           <TouchableOpacity onPress={() => router.push('/projects')} style={[styles.navBtn, { borderColor: theme.accent }]}>
             <MaterialIcons name="menu" size={26} color={theme.accent} />
@@ -104,45 +56,16 @@ useEffect(() => {
         <ScrollView contentContainerStyle={{ padding: 20 }}>
           <View style={styles.tabs}>
             {['MUSIC', 'ART', 'WRITE'].map(tab => (
-              <TouchableOpacity
-                key={tab}
-                onPress={() => setActiveTab(tab)}
-                style={[styles.tab, { backgroundColor: activeTab === tab ? theme.accent : 'transparent', borderColor: theme.accent }]}
-              >
+              <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)} style={[styles.tab, { backgroundColor: activeTab === tab ? theme.accent : 'transparent', borderColor: theme.accent }]}>
                 <Text style={{ color: activeTab === tab ? '#000' : theme.text, fontFamily: 'OswaldBold' }}>{tab}</Text>
               </TouchableOpacity>
             ))}
           </View>
-
-          <TextInput
-            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]}
-            placeholder={t.placeholder1}
-            placeholderTextColor="#777"
-            value={f1}
-            onChangeText={setF1}
-          />
-          {/* ... остальные инпуты ... */}
-          <TextInput
-            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]}
-            placeholder={t.placeholder2}
-            placeholderTextColor="#777"
-            value={f2}
-            onChangeText={setF2}
-          />
-          <TextInput
-            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card, height: 150 }]}
-            placeholder={t.placeholder3}
-            placeholderTextColor="#777"
-            multiline
-            value={f3}
-            onChangeText={setF3}
-          />
-
-          <TouchableOpacity style={[styles.pubBtn, { backgroundColor: theme.accent }]} onPress={handlePublish}>
-            <Text style={styles.pubBtnText}>{t.publish}</Text>
-          </TouchableOpacity>
+          <TextInput style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]} placeholder={t.placeholder1} placeholderTextColor="#777" value={f1} onChangeText={setF1} />
+          <TextInput style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]} placeholder={t.placeholder2} placeholderTextColor="#777" value={f2} onChangeText={setF2} />
+          <TextInput style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card, height: 150 }]} placeholder={t.placeholder3} placeholderTextColor="#777" multiline value={f3} onChangeText={setF3} />
+          <TouchableOpacity style={[styles.pubBtn, { backgroundColor: theme.accent }]} onPress={handlePublish}><Text style={styles.pubBtnText}>{t.publish}</Text></TouchableOpacity>
         </ScrollView>
-      </BlurView>
     </View>
   );
 }

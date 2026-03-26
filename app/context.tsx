@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Image } from 'expo-image'; // А не из 'react-native'
+import { Image } from 'expo-image';
 
 export const STRINGS = {
   RU: {
@@ -16,16 +16,14 @@ export const STRINGS = {
     musicTypes: ['ЗАРАГ', 'EP', 'АЛЬБОМ'], writeTypes: ['ТЕКСТ', 'ÆМДЗÆВГÆ', 'ЧИНЫГ', 'ÆМБЫРДГОНД', 'ЦИТАТÆ'], artTypes: ['НЫВ', 'КОЛЛЕКЦИ', 'РАВдыст', 'ДИЗАЙН']
   }
 };
-// В твоем файле с темами
 
-// Твои темы оставляем как были, я сократил код для читаемости, вставь свои PALETTES сюда:
 export const PALETTES = {
-
-  GONZO: { id: 'GONZO', name: 'GONZO (ХАОС)', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: 'https://media.giphy.com/media/l41YcWb5tEwB8AovG/giphy.gif',bgLottie:null },
-  ABYSS: { id: 'ABYSS', name: 'БЕЗДНА', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: require('../assets/0313.gif),bgLottie:null },
-  GRADIENT: { id: 'GRADIENT', name: 'GRADIENT', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg:null, bgLottie: require('../assets/animations/Gradient Animated Background.json')},
-  MATRIX: { id: 'MATRIX', name: 'MATRIX', bg: '#000', accent: '#00FF41', text: '#00FF41', card: 'rgba(0,20,0,0.8)', bgImg: 'https://media.giphy.com/media/oWjyixDbWuAk8/giphy.gif' },
-  PITCH: { id: 'PITCH', name: 'BLACK', bg: '#000', accent: '#FFF', text: '#CCC', card: '#111', bgImg: null },
+  GONZO: { id: 'GONZO', name: 'GONZO (ХАОС)', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: 'https://media.giphy.com/media/l41YcWb5tEwB8AovG/giphy.gif', bgLottie: null },
+  ABYSS: { id: 'ABYSS', name: 'БЕЗДНА', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: 'https://i.ibb.co/your-direct-link.jpg', bgLottie: null }, // Ссылка с Я.Диска заменена на пример прямой ссылки
+  GRADIENT: { id: 'GRADIENT', name: 'GRADIENT', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: null, bgLottie: require('../assets/animations/Gradient Animated Background.json') },
+  MATRIX: { id: 'MATRIX', name: 'MATRIX', bg: '#000', accent: '#00FF41', text: '#00FF41', card: 'rgba(0,20,0,0.8)', bgImg: 'https://media.giphy.com/media/oWjyixDbWuAk8/giphy.gif', bgLottie: null },
+  PITCH: { id: 'PITCH', name: 'BLACK', bg: '#000', accent: '#FFF', text: '#CCC', card: '#111', bgImg: null, bgLottie: null },
+  LOCAL: { id: 'LOCAL', name: 'ЛОКАЛ ФОТО', bg: '#000', accent: '#FF0055', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: require('../assets/abyss.png'), bgLottie: null }, // ТВОЯ ЛОКАЛЬНАЯ ФОТКА (ИЛИ ГИФКА)
 };
 
 const ThemeContext = createContext(null);
@@ -74,14 +72,10 @@ export default function ThemeProvider({ children }) {
     setSavedThemes(updated); saveToStorage('savedThemes', updated); applyTheme(newT);
   };
 
-  // CRUD для проектов
   const saveProject = (p) => {
     let n;
-    if (projects.find(x => x.id === p.id)) {
-      n = projects.map(x => x.id === p.id ? p : x); // Обновление
-    } else {
-      n = [p, ...projects]; // Создание
-    }
+    if (projects.find(x => x.id === p.id)) n = projects.map(x => x.id === p.id ? p : x);
+    else n = [p, ...projects];
     setProjects(n); saveToStorage('projects', n);
   };
 
@@ -90,7 +84,6 @@ export default function ThemeProvider({ children }) {
     setProjects(n); saveToStorage('projects', n);
   };
 
-  // ГОНЗО-ГЕНЕРАТОР ИДЕЙ (От души)
   const getRandomIdea = (tab) => {
     const ideas = {
       MUSIC: ["Симфония из звуков ломающихся костей и драм-машины 808.", "Кантри-альбом о кибернетическом Иисусе.", "Сингл, где бас звучит как работающий холодильник в 3 часа ночи."],
