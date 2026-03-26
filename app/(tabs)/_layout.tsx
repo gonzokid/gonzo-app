@@ -8,43 +8,37 @@ import { BlurView } from 'expo-blur';
 export default function TabLayout() {
   const { theme } = useTheme();
 
-  const getImgSource = (src) => {
-    if (!src) return null;
-    return typeof src === 'string' ? { uri: src } : src;
-  };
-
   return (
     <View style={{ flex: 1, backgroundColor: theme.bg }}>
 
-      {/* 1. Глобальный Lottie (если есть) */}
+      {/* Слой 1: Lottie */}
       {theme.bgLottie && (
         <LottieView
           source={theme.bgLottie}
           autoPlay
           loop
-          speed={0.6}
           style={StyleSheet.absoluteFillObject}
           resizeMode="cover"
         />
       )}
 
-      {/* 2. Глобальная Картинка/Гифка (если есть и нет Lottie) */}
+      {/* Слой 2: Картинка (URL или require) */}
       {theme.bgImg && !theme.bgLottie && (
         <Image
-          source={getImgSource(theme.bgImg)}
+          source={typeof theme.bgImg === 'string' ? { uri: theme.bgImg } : theme.bgImg}
           style={StyleSheet.absoluteFillObject}
           contentFit="cover"
         />
       )}
 
-      {/* 3. Глобальный Блюр */}
+      {/* Слой 3: Общий Блюр для всех вкладок */}
       <BlurView intensity={theme.bgLottie ? 30 : 50} tint="dark" style={StyleSheet.absoluteFillObject} />
 
-      {/* 4. Контейнеры экранов (Сделаны ПРОЗРАЧНЫМИ!) */}
+      {/* Сами табы */}
       <Tabs screenOptions={{
         headerShown: false,
-        tabBarStyle: { display: 'none' },
-        sceneContainerStyle: { backgroundColor: 'transparent' } // ОЧЕНЬ ВАЖНО
+        tabBarStyle: { display: 'none' }, // Прячем нижнюю панель, раз у тебя кастомная навигация
+        sceneContainerStyle: { backgroundColor: 'transparent' } // Стеклянный эффект
       }}>
         <Tabs.Screen name="index" />
         <Tabs.Screen name="projects" />

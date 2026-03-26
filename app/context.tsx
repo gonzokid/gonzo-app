@@ -20,7 +20,7 @@ export const STRINGS = {
 export const PALETTES = {
   GONZO: { id: 'GONZO', name: 'GONZO (ХАОС)', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: 'https://media.giphy.com/media/l41YcWb5tEwB8AovG/giphy.gif', bgLottie: null },
   ABYSS: { id: 'ABYSS', name: 'БЕЗДНА', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: 'https://i.ibb.co/your-direct-link.jpg', bgLottie: null }, // Ссылка с Я.Диска заменена на пример прямой ссылки
-  GRADIENT: { id: 'GRADIENT', name: 'GRADIENT', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: null, bgLottie: require('../assets/animations/Gradient Animated Background.json') },
+  GRADIENT: { id: 'GRADIENT', name: 'GRADIENT', bg: '#000', accent: '#2E8B57', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: null, bgLottie: require('../assets/animations/gradient_bg.json') },
   MATRIX: { id: 'MATRIX', name: 'MATRIX', bg: '#000', accent: '#00FF41', text: '#00FF41', card: 'rgba(0,20,0,0.8)', bgImg: 'https://media.giphy.com/media/oWjyixDbWuAk8/giphy.gif', bgLottie: null },
   PITCH: { id: 'PITCH', name: 'BLACK', bg: '#000', accent: '#FFF', text: '#CCC', card: '#111', bgImg: null, bgLottie: null },
   LOCAL: { id: 'LOCAL', name: 'ЛОКАЛ ФОТО', bg: '#000', accent: '#FF0055', text: '#FFF', card: 'rgba(20,0,10,0.8)', bgImg: require('../assets/abyss.png'), bgLottie: null }, // ТВОЯ ЛОКАЛЬНАЯ ФОТКА (ИЛИ ГИФКА)
