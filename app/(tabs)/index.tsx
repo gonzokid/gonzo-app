@@ -1,5 +1,7 @@
 export default function MainEngine() {
-  const { theme, t } = useTheme();
+ import { useTheme } from '@react-navigation/native';
+
+const { colors } = useTheme();
   // ... логика стейтов
 
   return (
