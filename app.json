@@ -1,35 +1,29 @@
 {
   "expo": {
-    "name": "gonzo-app",
+    "name": "GONZO LAB",
     "slug": "gonzo-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#F5F5ED"
       },
-      "package": "com.liofrop.gonzoapp"
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "package": "com.liofrop.gonzolab"
     },
     "extra": {
       "eas": {
         "projectId": "c8dc2d44-16f5-4c1a-a73a-48f0a4454ba9"
       }
     },
-    "owner": "liofrop"
+    "owner": "liofrop",
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

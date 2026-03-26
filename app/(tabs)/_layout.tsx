@@ -1,10 +1,11 @@
-import { Stack } from 'expo-router';
-import { View } from 'react-native';
+import { Tabs } from 'expo-router';
 
-export default function RootLayout() {
+export default function TabLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-    </Stack>
+    <Tabs screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}>
+      <Tabs.Screen name="index" />
+      <Tabs.Screen name="projects" />
+      <Tabs.Screen name="settings" />
+    </Tabs>
   );
 }

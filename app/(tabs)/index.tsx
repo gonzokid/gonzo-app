@@ -1,179 +1,159 @@
-import React, { useState } from 'react';
-import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, FlatList, Image, StatusBar
-} from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, ScrollView, Animated, Vibration } from 'react-native';
+import { MaterialIcons, FontAwesome5 } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { useTheme } from '../context';
+import { BlurView } from 'expo-blur';
+import { Image } from 'expo-image';
+import LottieView from 'lottie-react-native';
 
-// --- КОНФИГ ГОНЗО-СТИЛЯ ---
-const GONZO_COLORS = {
-  bg: '#F5F5ED',      // Грязная бумага
-  black: '#1A1A1A',   // Глубокий черный для границ
-  magenta: '#FF0055', // Бешеный розовый
-  acidGreen: '#CCFF00', // Кислотный лимон
-  paperWhite: '#FFFFFF'
-};
-
-export default function Index() {
-  const insets = useSafeAreaInsets();
-  const [loading, setLoading] = useState(false);
-
-  // Фейковые данные для теста
-  const projects = [
-    { id: '1', title: 'RAZOR SHARP SOLOS', desc: 'Записи из подвала. Громко. Плохо. Искренне.', type: 'ALBUM' },
-    { id: '2', title: 'BAT COUNTRY BEATS', desc: 'Ритмы для поездки через пустыню.', type: 'SINGLE' },
-  ];
-
-  if (loading) {
-    return (
-      <View style={[styles.center, { backgroundColor: GONZO_COLORS.bg }]}>
-        <ActivityIndicator size="large" color={GONZO_COLORS.magenta} />
-      </View>
-    );
-  }
+const GlitchTitle = ({ text, color }) => {
+  const anim = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const glitch = () => {
+      Animated.sequence([
+        Animated.timing(anim, { toValue: 1.1, duration: 50, useNativeDriver: true }),
+        Animated.timing(anim, { toValue: 1, duration: 100, useNativeDriver: true }),
+      ]).start();
+    };
+    const interval = setInterval(glitch, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: GONZO_COLORS.bg }}>
-      <StatusBar barStyle="dark-content" />
+    <Animated.View style={{ transform: [{ scale: anim }], flexDirection: 'row', alignItems: 'center' }}>
+      <FontAwesome5 name="skull-crossbones" size={26} color={color} style={{ marginRight: 10 }} />
+      <Text style={[styles.logoText, { color, textShadowColor: color, textShadowRadius: 10 }]}>{text}</Text>
+    </Animated.View>
+  );
+};
 
-      <ScrollView
-        contentContainerStyle={{
-          paddingTop: insets.top + 20,
-          paddingBottom: insets.bottom + 100,
-          paddingHorizontal: 20
-        }}
-      >
-        {/* ЗАГОЛОВОК В СТИЛЕ ГАЗЕТНОЙ ВЫРЕЗКИ */}
-        <View style={styles.headerBox}>
-          <Text style={styles.mainTitle}>GXNZO / DAILY</Text>
-          <View style={styles.divider} />
-          <Text style={styles.subTitle}>МУЗЫКАЛЬНЫЙ ХАОС И ПОРТФОЛИО</Text>
+export default function MainEngine() {
+    const lottieRef = useRef(null);
+
+useEffect(() => {
+  if (theme.bgLottie) {
+    lottieRef.current?.play();
+  }
+}, [theme]); // Когда тема меняется, пинаем анимаци
+  const router = useRouter();
+  // Заменил addProject на saveProject, так как в контексте функция называется так
+  const { theme, t, saveProject } = useTheme();
+  const [activeTab, setActiveTab] = useState('MUSIC');
+  const [f1, setF1] = useState('');
+  const [f2, setF2] = useState('');
+  const [f3, setF3] = useState('');
+
+  const handlePublish = () => {
+    if (!f1) return;
+    Vibration.vibrate(70);
+    saveProject({
+      id: Date.now().toString(),
+      type: activeTab,
+      field1: f1,
+      field2: f2,
+      field3: f3,
+      date: new Date().toLocaleDateString()
+    });
+    setF1(''); setF2(''); setF3('');
+  };
+
+  // Хелпер для правильной подгрузки картинок
+  const getImgSource = (src) => {
+    if (!src) return null;
+    return typeof src === 'string' ? { uri: src } : src;
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: theme.bg }}>
+
+      {/* 1. LOTTIE (НИЖНИЙ СЛОЙ) */}
+      {theme.bgLottie && (
+        <LottieView
+        ref={lottieRef}
+          source={theme.bgLottie}
+          autoPlay
+          loop
+          speed={0.6}
+          style={StyleSheet.absoluteFillObject}
+          resizeMode="cover"
+        />
+      )}
+
+      {/* 2. IMAGE (ТОЛЬКО ЕСЛИ НЕТ LOTTIE) */}
+      {theme.bgImg && !theme.bgLottie && (
+        <Image
+          source={getImgSource(theme.bgImg)}
+          style={StyleSheet.absoluteFillObject}
+          contentFit="cover"
+        />
+      )}
+
+      {/* 3. КОНТЕНТ С БЛЮРОМ */}
+      <BlurView intensity={theme.bgLottie ? 30 : 60} tint="dark" style={{ flex: 1 }}>
+        <View style={styles.topNav}>
+          <TouchableOpacity onPress={() => router.push('/projects')} style={[styles.navBtn, { borderColor: theme.accent }]}>
+            <MaterialIcons name="menu" size={26} color={theme.accent} />
+          </TouchableOpacity>
+          <GlitchTitle text={t.mainTitle} color={theme.accent} />
+          <TouchableOpacity onPress={() => router.push('/settings')} style={[styles.navBtn, { borderColor: theme.accent }]}>
+            <MaterialIcons name="settings" size={26} color={theme.accent} />
+          </TouchableOpacity>
         </View>
 
-        {/* СПИСОК КАРТОЧЕК */}
-        {projects.map((item) => (
-          <TouchableOpacity key={item.id} style={styles.card} activeOpacity={0.9}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardType}>{item.type}</Text>
-            </View>
-            <View style={styles.cardBody}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardDesc}>{item.desc}</Text>
-            </View>
-            {/* Жесткая черная плашка внизу */}
-            <View style={styles.cardFooter}>
-              <Text style={styles.footerText}>ИЗМЕНИТЬ // EDIT</Text>
-              <MaterialIcons name="edit" size={18} color={GONZO_COLORS.paperWhite} />
-            </View>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+        <ScrollView contentContainerStyle={{ padding: 20 }}>
+          <View style={styles.tabs}>
+            {['MUSIC', 'ART', 'WRITE'].map(tab => (
+              <TouchableOpacity
+                key={tab}
+                onPress={() => setActiveTab(tab)}
+                style={[styles.tab, { backgroundColor: activeTab === tab ? theme.accent : 'transparent', borderColor: theme.accent }]}
+              >
+                <Text style={{ color: activeTab === tab ? '#000' : theme.text, fontFamily: 'OswaldBold' }}>{tab}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
 
-      {/* КВАДРАТНАЯ КНОПКА ДОБАВЛЕНИЯ */}
-      <TouchableOpacity
-        style={[styles.fab, { bottom: insets.bottom + 20 }]}
-        onPress={() => alert('ДОБАВИТЬ НОВЫЙ ХАОС?')}
-      >
-        <MaterialIcons name="add" size={40} color={GONZO_COLORS.black} />
-      </TouchableOpacity>
+          <TextInput
+            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]}
+            placeholder={t.placeholder1}
+            placeholderTextColor="#777"
+            value={f1}
+            onChangeText={setF1}
+          />
+          {/* ... остальные инпуты ... */}
+          <TextInput
+            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card }]}
+            placeholder={t.placeholder2}
+            placeholderTextColor="#777"
+            value={f2}
+            onChangeText={setF2}
+          />
+          <TextInput
+            style={[styles.input, { color: theme.text, borderColor: theme.accent, backgroundColor: theme.card, height: 150 }]}
+            placeholder={t.placeholder3}
+            placeholderTextColor="#777"
+            multiline
+            value={f3}
+            onChangeText={setF3}
+          />
+
+          <TouchableOpacity style={[styles.pubBtn, { backgroundColor: theme.accent }]} onPress={handlePublish}>
+            <Text style={styles.pubBtnText}>{t.publish}</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </BlurView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  headerBox: {
-    marginBottom: 40,
-    borderLeftWidth: 8,
-    borderLeftColor: GONZO_COLORS.black,
-    paddingLeft: 15,
-  },
-  mainTitle: {
-    fontSize: 48,
-    fontWeight: '900',
-    color: GONZO_COLORS.black,
-    letterSpacing: -2,
-    lineHeight: 48,
-  },
-  subTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: GONZO_COLORS.magenta,
-    marginTop: 5,
-  },
-  divider: {
-    height: 4,
-    backgroundColor: GONZO_COLORS.black,
-    marginVertical: 5,
-    width: '100%',
-  },
-  // БРУТАЛИСТСКАЯ КАРТОЧКА
-  card: {
-    backgroundColor: GONZO_COLORS.paperWhite,
-    borderWidth: 4,
-    borderColor: GONZO_COLORS.black,
-    marginBottom: 30,
-    // Тень без размытия (Neubrutalism)
-    shadowColor: GONZO_COLORS.black,
-    shadowOffset: { width: 8, height: 8 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 5,
-  },
-  cardHeader: {
-    backgroundColor: GONZO_COLORS.acidGreen,
-    padding: 5,
-    borderBottomWidth: 4,
-    borderColor: GONZO_COLORS.black,
-    alignItems: 'center',
-  },
-  cardType: {
-    fontWeight: '900',
-    fontSize: 12,
-    letterSpacing: 2,
-  },
-  cardBody: {
-    padding: 15,
-  },
-  cardTitle: {
-    fontSize: 26,
-    fontWeight: '900',
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  cardDesc: {
-    fontSize: 16,
-    lineHeight: 20,
-    color: '#333',
-    fontWeight: '500',
-  },
-  cardFooter: {
-    backgroundColor: GONZO_COLORS.black,
-    padding: 10,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  footerText: {
-    color: GONZO_COLORS.paperWhite,
-    fontWeight: 'bold',
-    fontSize: 12,
-  },
-  fab: {
-    position: 'absolute',
-    right: 20,
-    width: 70,
-    height: 70,
-    backgroundColor: GONZO_COLORS.acidGreen,
-    borderWidth: 4,
-    borderColor: GONZO_COLORS.black,
-    justifyContent: 'center',
-    alignItems: 'center',
-    // Тень для кнопки
-    shadowColor: GONZO_COLORS.black,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-  }
+  topNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 60, paddingHorizontal: 20, marginBottom: 20 },
+  navBtn: { padding: 10, borderRadius: 10, borderWidth: 1 },
+  logoText: { fontFamily: 'OswaldBold', fontSize: 24, letterSpacing: 2 },
+  tabs: { flexDirection: 'row', gap: 10, marginBottom: 20 },
+  tab: { flex: 1, padding: 12, borderRadius: 8, borderWidth: 1, alignItems: 'center' },
+  input: { fontFamily: 'OswaldReg', fontSize: 18, borderWidth: 1, borderRadius: 10, padding: 15, marginBottom: 15 },
+  pubBtn: { padding: 20, borderRadius: 10, alignItems: 'center' },
+  pubBtnText: { fontFamily: 'OswaldBold', fontSize: 22, color: '#000' }
 });
